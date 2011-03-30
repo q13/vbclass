@@ -2,6 +2,7 @@
 <html>
     <head>
         <script src="min/VBClass.loader.js"></script>
+        <script src="src/JSON.loader.js"></script>
         <script src="http://www.3site.eu/wru/wru.js"></script>
         <script>
         // let's do stuff onload ...
@@ -181,6 +182,31 @@
                     wru.assert("calls object", calls === 4);
                     wru.assert("object primitive", (new AllTogether(456)).getSet === 456);
                     wru.assert("calls primitive", calls === 8);
+                }
+            },{
+                name: "toString compromise",
+                test: function () {
+                    function toString(object) {
+                        return object.toString();
+                    }
+                    wru.assert("[object Object]" === toString(VBClass("Stringable", {
+                        toString: {
+                            value: function () {
+                                return "[object Object]";
+                            }
+                        }
+                    })()));
+                }
+            },{
+                name: "serializable",
+                test: function () {
+                    wru.assert('{"ok":true}' === JSON.stringify(VBClass("Serializable", {
+                        toJSON: {
+                            value: function (key) {
+                                return {ok:true};
+                            }
+                        }
+                    })()));
                 }
             },{
                 name: "no duplicated classes",
